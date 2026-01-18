@@ -7,3 +7,4 @@ scikit-learn
 joblib
 mlflow<3
 python-multipart
+httpx
