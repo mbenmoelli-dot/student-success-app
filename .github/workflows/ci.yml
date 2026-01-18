@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Install deps (API + tests)
+        run: |
+          pip install -r api/requirements.txt
+          pip install pytest
+      - name: Lint light (py_compile)
+        run: |
+          python -m py_compile api/app.py
+      - name: Run tests
+        run: |
+          pytest -q
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image (smoke)
+        run: |
+          docker build -t student-success-api:ci -f Dockerfile .
